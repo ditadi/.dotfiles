@@ -15,6 +15,18 @@ local cmp_mappings = lsp.defaults.cmp_mappings({
   ["<C-Space>"] = cmp.mapping.complete(),
 })
 
+local enable_format_on_save = function(_, bufnr)
+  vim.api.nvim_clear_autocmds({ group = augroup_format, buffer = bufnr })
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    group = augroup_format,
+    buffer = bufnr,
+    callback = function()
+      vim.lsp.buf.format({ bufnr = bufnr })
+    end,
+  })
+end
+
+
 lsp.on_attach(function(client, bufnr)
   local opts = {buffer = bufnr, remap = false}
 
@@ -29,6 +41,8 @@ lsp.on_attach(function(client, bufnr)
   vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
   vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
   vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
+
+  enable_format_on_save(client, bufnr)
 end)
 
 lsp.setup()

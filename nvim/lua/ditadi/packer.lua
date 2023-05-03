@@ -46,4 +46,7 @@ return require('packer').startup(function(use)
 	use ('windwp/nvim-ts-autotag')
 
 	use ('glepnir/lspsaga.nvim')
+  	use 'hrsh7th/cmp-buffer' 
+  	use 'hrsh7th/cmp-nvim-lsp'
+  	use 'hrsh7th/nvim-cmp'
 end)
