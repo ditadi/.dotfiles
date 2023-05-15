@@ -1,8 +1,18 @@
 local lsp = require("lsp-zero")
 
-lsp.preset("recommended")
+require('mason').setup()
+require('mason-lspconfig').setup()
 
-lsp.ensure_installed({'tsserver', 'eslint', 'rust_analyzer',})
+-- Call the language servers you have installed
+require('lspconfig').tsserver.setup({
+  on_attach = on_attach,
+  filetypes = { "typescript", "typescriptreact", "typescript.tsx" },
+  cmd = { "typescript-language-server", "--stdio" },
+  capabilities = capabilities,
+	root_dir = function() return vim.loop.cwd() end
+})
+
+lsp.preset("recommended")
 
 local cmp = require("cmp")
 

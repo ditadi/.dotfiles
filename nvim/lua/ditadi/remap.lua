@@ -7,3 +7,6 @@ vim.keymap.set('n', '<Space>', '<C-w>w')
 
 -- Delete a word backwards
 vim.keymap.set('n', 'dw', 'vb"_d')
+
+-- Move Backwards with Q and Forward with E
+vim.keymap.set('n', 'q', 'b')
