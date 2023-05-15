@@ -37,11 +37,11 @@ if [[ $PLAYER_STATE == "playing" ]]; then
 fi
 
 if [[ ${#title} -gt 25 ]]; then
-TITLE=$(printf "$(echo $title | cut -c 1-20)…")
+TITLE=$(printf "$(echo $title | cut -c 1-28)…")
 fi
 
 if [[ ${#artist} -gt 25 ]]; then
-ARTIST=$(printf "$(echo $artist | cut -c 1-20)…")
+ARTIST=$(printf "$(echo $artist | cut -c 1-30)…")
 fi
 
 # if [[ ${#ALBUM} -gt 25 ]]; then
@@ -49,5 +49,5 @@ fi
 # fi
 
 sketchybar -m --set music icon="$icon"          \
-    --set music label="${TITLE} x ${ARTIST}"    \
+    --set music label="${TITLE} - ${artist}"    \
     --set music drawing=on
