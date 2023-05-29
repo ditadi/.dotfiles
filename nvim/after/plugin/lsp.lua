@@ -13,6 +13,7 @@ require('lspconfig').tsserver.setup({
 })
 
 lsp.preset("recommended")
+lsp.ensure_installed({'tsserver', 'rust_analyzer'})
 
 local cmp = require("cmp")
 
