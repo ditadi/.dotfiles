@@ -23,10 +23,14 @@ vim.opt.incsearch = true
 
 vim.opt.termguicolors = true
 
--- vim.opt.scrolloff = 8
--- vim.opt.signcolumn = "yes"
--- vim.opt.isfname:append("@-@")
+-- highlight yanked text for 200ms using the "Visual" highlight group
+vim.cmd [[
+augroup highlight_yank
+autocmd!
+au TextYankPost * silent! lua vim.highlight.on_yank({higroup="Visual", timeout=200})
+augroup END
+]]
 
--- vim.opt.updatetime = 50
+vim.opt.cursorline = true
 
--- vim.opt.colorcolumn = "80"
+vim.opt.clipboard:append("unnamedplus")

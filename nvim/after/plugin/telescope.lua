@@ -32,7 +32,7 @@ telescope.setup {
           ["l"] = require('telescope.actions').select_default,
           ["N"] = fb_actions.create,
           ["h"] = fb_actions.goto_parent_dir,
-      	  ["o"] = fb_actions.open,
+          ["o"] = fb_actions.open,
           ["/"] = function()
             vim.cmd('startinsert')
           end
@@ -44,24 +44,16 @@ telescope.setup {
 
 telescope.load_extension("file_browser")
 
-
-vim.keymap.set('n', 'ff', builtin.find_files, {})
-vim.keymap.set('n', 'fg', builtin.live_grep, {})
-vim.keymap.set('n', 'fg', builtin.git_files, {})
-vim.keymap.set('n', 'ft', function()
-	builtin.grep_string({search = vim.fn.input("Grep > ")});
-end)
-
+vim.keymap.set("n", "ff", builtin.find_files, {})
+vim.keymap.set("n", "fg", builtin.live_grep, {})
 vim.keymap.set("n", "fb", function()
-	telescope.extensions.file_browser.file_browser({
-	  path = "%:p:h",
-	  cwd = telescope_buffer_dir(),
-	  respect_gitignore = false,
-	  hidden = true,
-	  grouped = true,
-	  previewer = false,
-	  initial_mode = "normal",
-	  layout_config = { height = 40 }
-	})
+  telescope.extensions.file_browser.file_browser({
+    path = "%:p:h",
+    cwd = telescope_buffer_dir(),
+    respect_gitignore = false,
+    hidden = true,
+    grouped = true,
+    initial_mode = "normal",
+    layout_config = { height = 20 }
+  })
 end)
-  
