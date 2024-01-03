@@ -1,3 +1,3 @@
 require("ditadi.remap");
-require("ditadi.packer");
 require("ditadi.set");
+require("ditadi.lazy_init");
