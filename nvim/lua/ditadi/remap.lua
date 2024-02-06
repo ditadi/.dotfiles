@@ -30,16 +30,12 @@ vim.keymap.set("n", "<leader>n", "zL")
 
 -- Quick Save and Quick Quit
 vim.keymap.set("n", "<leader>w", ":w<CR>")
+
 vim.keymap.set("n", "<leader>q", ":q<CR>")
 
-
--- Open a new line
 vim.keymap.set("n", "<leader>o", "a<CR><Esc>O")
-
--- Tmux Sessionizer 
 vim.api.nvim_set_keymap('n', 'ff', [[:silent !tmux neww tmux-sessionizer<CR>]], { noremap = true, silent = true })
 
--- Format
 vim.api.nvim_exec([[
   function! SetFileTypeMapping()
     if &filetype ==# 'go'

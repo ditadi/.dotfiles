@@ -1,53 +1,164 @@
-#!/usr/bin/env bash
-
-# FIXME: Running an osascript on an application target opens that app
-# This sleep is needed to try and ensure that theres enough time to
-# quit the app before the next osascript command is called. I assume 
-# com.apple.iTunes.playerInfo fires off an event when the player quits
-# so it imediately runs before the process is killed
-sleep 1
-
-APP_STATE=$(pgrep -x Music)
-if [[ ! $APP_STATE ]]; then 
-    sketchybar -m --set music drawing=off
-    exit 0
-fi
-
-PLAYER_STATE=$(osascript -e "tell application \"Music\" to set playerState to (get player state) as text")
-if [[ $PLAYER_STATE == "stopped" ]]; then
-    sketchybar --set music drawing=off
-    exit 0
-fi
-
-
-title=$(osascript -e 'tell application "Music" to get name of current track')
-artist=$(osascript -e 'tell application "Music" to get artist of current track')
+#!/bin/bash
+# PLAYER_STATE=$(osascript -e "tell application \"Music\" to set playerState to (get player state) as text")
+# REPEAT=$(osascript -e 'tell application "Music" to get repeating')
+# SHUFFLE=$(osascript -e 'tell application "Music" to get shuffling')
+# TRACK=$(osascript -e 'tell application "Music" to get name of current track')
+# ARTIST=$(osascript -e 'tell application "Music" to get artist of current track')
 # ALBUM=$(osascript -e 'tell application "Music" to get album of current track')
-loved=$(osascript -l JavaScript -e "Application('Music').currentTrack().loved()")
-if [[ $loved ]]; then
-    icon=""
-fi
+# SHUFFLE=$(osascript -e 'tell application "Music" to get shuffling')
+# REPEAT=$(osascript -e 'tell application "Music" to get repeating')
+# COVER=$(osascript -e 'tell application "Music" to get artwork url of current track')
+#
 
-if [[ $PLAYER_STATE == "paused" ]]; then
-    icon=""
-fi
+next ()
+{
+  osascript -e 'tell application "Music" to play next track'
+}
 
-if [[ $PLAYER_STATE == "playing" ]]; then
-    icon=""
-fi
+back () 
+{
+  osascript -e 'tell application "Music" to play previous track'
+}
 
-if [[ ${#title} -gt 25 ]]; then
-TITLE=$(printf "$(echo $title | cut -c 1-28)…")
-fi
+play () 
+{
+  osascript -e 'tell application "Music" to playpause'
+}
 
-if [[ ${#artist} -gt 25 ]]; then
-ARTIST=$(printf "$(echo $artist | cut -c 1-30)…")
-fi
+repeat () 
+{
+  REPEAT=$(osascript -e 'tell application "Music" to get repeating')
+  if [ "$REPEAT" = "false" ]; then
+    sketchybar -m --set music.repeat icon.highlight=on
+    osascript -e 'tell application "Music" to set repeating to true'
+  else 
+    sketchybar -m --set music.repeat icon.highlight=off
+    osascript -e 'tell application "Music" to set repeating to false'
+  fi
+}
 
-# if [[ ${#ALBUM} -gt 25 ]]; then
-#   ALBUM=$(printf "$(echo $ALBUM | cut -c 1-12)…")
-# fi
+shuffle () 
+{
+  SHUFFLE=$(osascript -e 'tell application "Music" to get shuffling')
+  if [ "$SHUFFLE" = "false" ]; then
+    sketchybar -m --set music.shuffle icon.highlight=on
+    osascript -e 'tell application "Music" to set shuffling to true'
+  else 
+    sketchybar -m --set music.shuffle icon.highlight=off
+    osascript -e 'tell application "Music" to set shuffling to false'
+  fi
+}
 
-sketchybar -m --set music icon="$icon"          \
-    --set music label="${TITLE} - ${artist}"    \
-    --set music drawing=on
+
+update ()
+{
+
+  PLAYER_STATE=$(osascript -e "tell application \"Music\" to set playerState to (get player state) as text")
+  PLAYING=1
+  # if [ "$(echo "$INFO" | jq -r '.["Player State"]')" = "Playing" ]; then
+  if [[ $PLAYER_STATE == "playing" ]]; then
+    PLAYING=0
+    # TRACK="$(echo "$INFO" | jq -r .Name | sed 's/\(.\{20\}\).*/\1.../')"
+    TRACK=$(osascript -e 'tell application "Music" to get name of current track')
+    # ARTIST="$(echo "$INFO" | jq -r .Artist | sed 's/\(.\{20\}\).*/\1.../')"
+    ARTIST=$(osascript -e 'tell application "Music" to get artist of current track')
+    # ALBUM="$(echo "$INFO" | jq -r .Album | sed 's/\(.\{25\}\).*/\1.../')"
+    ALBUM=$(osascript -e 'tell application "Music" to get album of current track')
+    SHUFFLE=$(osascript -e 'tell application "Music" to get shuffling')
+    REPEAT=$(osascript -e 'tell application "Music" to get repeating')
+    # COVER=$(osascript -e 'tell application "Music" to get artwork url of current track')
+  fi
+
+  args=()
+  if [ $PLAYING -eq 0 ]; then
+    # curl -s --max-time 20 "$COVER" -o /tmp/cover.jpg
+    if [ "$ARTIST" == "" ]; then
+      args+=(--set music.title label="$TRACK"
+             --set music.album label="Podcast"
+             --set music.artist label="$ALBUM"  )
+    else
+      args+=(--set music.title label="$TRACK"
+             --set music.album label="$ALBUM"
+             --set music.artist label="$ARTIST")
+    fi
+    args+=(--set music.play icon=
+           --set music.shuffle icon.highlight=$SHUFFLE
+           --set music.repeat icon.highlight=$REPEAT
+           # --set music.cover background.image="/tmp/cover.jpg"
+                               # background.color=0x00000000
+           --set music.anchor drawing=on                      )
+  else
+    args+=(--set music.anchor drawing=off popup.drawing=off
+           --set music.play icon=                         )
+  fi
+  sketchybar -m "${args[@]}"
+}
+
+scrubbing() {
+  DURATION_MS=$(osascript -e 'tell application "Music" to get duration of current track')
+  DURATION=$((DURATION_MS/1000))
+
+  TARGET=$((DURATION*PERCENTAGE/100))
+  osascript -e "tell application \"Music\" to set player position to $TARGET"
+  sketchybar --set music.state slider.percentage=$PERCENTAGE
+}
+
+scroll() {
+  DURATION_MS=$(osascript -e 'tell application "Music" to get duration of current track')
+  DURATION=$((DURATION_MS/1000))
+
+  FLOAT="$(osascript -e 'tell application "Music" to get player position')"
+  TIME=${FLOAT%.*}
+  
+  sketchybar --animate linear 10 \
+             --set music.state slider.percentage="$((TIME*100/DURATION))" \
+                                 icon="$(date -r $TIME +'%M:%S')" \
+                                 label="$(date -r $DURATION +'%M:%S')"
+}
+
+mouse_clicked () {
+  case "$NAME" in
+    "music.next") next
+    ;;
+    "music.back") back
+    ;;
+    "music.play") play
+    ;;
+    "music.shuffle") shuffle
+    ;;
+    "music.repeat") repeat
+    ;;
+    "music.state") scrubbing
+    ;;
+    *) exit
+    ;;
+  esac
+}
+
+popup () {
+  sketchybar --set music.anchor popup.drawing=$1
+}
+
+routine() {
+  case "$NAME" in
+    "music.state") scroll
+    ;;
+    *) update
+    ;;
+  esac
+}
+
+case "$SENDER" in
+  "mouse.clicked") mouse_clicked
+  ;;
+  "mouse.entered") popup on
+  ;;
+  "mouse.exited"|"mouse.exited.global") popup off
+  ;;
+  "routine") routine
+  ;;
+  "forced") exit 0
+  ;;
+  *) update
+  ;;
+esac

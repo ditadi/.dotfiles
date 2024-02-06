@@ -4,8 +4,8 @@ vim.opt.wildignore:append { '*/node_modules/*' }
 
 vim.opt.numberwidth = 4
 vim.opt.scrolloff = 8
-vim.opt.tabstop = 4
-vim.opt.softtabstop = 4
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.wrap = false
@@ -25,7 +25,7 @@ vim.opt.termguicolors = true
 
 vim.opt.signcolumn = "yes"
 vim.opt.updatetime = 50
-vim.opt.colorcolumn = "80"
+vim.opt.colorcolumn = "100"
 
 vim.opt.cursorline = true
 vim.opt.clipboard:append("unnamedplus")
@@ -46,5 +46,14 @@ augroup END
 vim.g.netrw_browse_split = 0
 vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
+vim.g.netrw_localrmdir = 'rm -r'
+
+vim.filetype.add({
+    extension = {
+        templ = "templ",
+    },
+})
 
 vim.cmd('set noshowmode')
+
+

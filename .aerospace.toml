@@ -1,0 +1,33 @@
+gaps.inner.horizontal = 10
+gaps.inner.vertical = 20 
+gaps.outer.top = 20 
+gaps.outer.bottom = 40 
+gaps.outer.left = 20 
+gaps.outer.right = 20 
+
+after-startup-command = ['exec-and-forget /opt/homebrew/opt/sketchybar/bin/sketchybar']
+
+# Notify Sketchybar about workspace change
+exec-on-workspace-change = ['/bin/bash', '-c',
+    '/opt/homebrew/opt/sketchybar/bin/sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
+]
+
+[mode.main.binding]
+alt-q = 'workspace 0'
+alt-w = 'workspace 1'
+alt-e = 'workspace 2'
+alt-r = 'workspace 3'
+alt-t = 'workspace 4'
+alt-y = 'workspace 5'
+alt-u = 'workspace 6'
+alt-i = 'workspace 7'
+
+alt-1 = 'move-node-to-workspace 0'
+alt-2 = 'move-node-to-workspace 1'
+alt-3 = 'move-node-to-workspace 2'
+alt-4 = 'move-node-to-workspace 3'
+alt-5 = 'move-node-to-workspace 4'
+alt-6 = 'move-node-to-workspace 5'
+alt-7 = 'move-node-to-workspace 6'
+alt-8 = 'move-node-to-workspace 7'
+alt-9 = 'move-node-to-workspace 8'
